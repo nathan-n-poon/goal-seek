@@ -8,7 +8,7 @@ using namespace std;
 
 bool equivalent(double result)
 {
-  return abs(result - (double)goal) < 10.0*precision;
+  return abs(result - (double)goal) < 2.0*precision;
 }
 
 double result(double interest)
