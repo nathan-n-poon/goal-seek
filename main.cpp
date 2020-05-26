@@ -1,14 +1,14 @@
 #include <iostream>
 #include <cmath>
 #define precision 0.000001
-#define goal 42500/15069.04
+#define goal 42500/15096.04
 #define power 4
 using namespace std;
 
 
 bool equivalent(double result)
 {
-  return abs(result - (double)goal) < 2.0*precision;
+  return abs(result - (double)goal) < 10.0*precision;
 }
 
 double result(double interest)
@@ -30,6 +30,9 @@ int main() {
       count++;
     }
   }
-  cout << (double)((double)sum/(double)count);
+  cout << "calculated interest: " << (double)((double)sum/(double)count) << endl;
+  cout << "result: " << result((double)((double)sum/(double)count)) << endl;
+  cout << "goal: " << goal << endl;
+  cout << "difference: " << result(((double)sum/(double)count))- goal<<endl; 
   
 }
