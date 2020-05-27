@@ -14,9 +14,14 @@ bool equivalent(double result, double sensitivity)
   return abs(result - (double)goal) < sensitivity;
 }
 
-double result(double interest)
+double POverA(double interest)
 {
   return (pow((1+interest),power)-1.0) / (interest*pow((1.0+interest),power));
+}
+
+double result(double arg, double (*f)(double))
+{
+  return (*f)(arg);
 }
 
 double interest(bool positive, double bound)
@@ -28,7 +33,7 @@ double interest(bool positive, double bound)
   {
     for( double i = bound; i > 0.0; i-=finePrecision)
     {
-      if (abs(result(i) - goal) < fineSensitivity)
+      if (abs(result(i, POverA) - goal) < fineSensitivity)
       {
         sum += i;
         count++;
@@ -45,7 +50,7 @@ double interest(bool positive, double bound)
   {
     for( double i = bound; i < 1.0; i+=finePrecision)
     {
-      if (abs(result(i) - goal) < fineSensitivity)
+      if (abs(result(i, POverA) - goal) < fineSensitivity)
       {
         sum += i;
         count++;
@@ -66,7 +71,7 @@ int main() {
 
   for (double j = 0.0; j < 1.0; j+=broadPrecision)
   {
-    double difference = result(j) - (double)goal;
+    double difference = result(j, POverA) - (double)goal;
     if(abs(difference) < broadSensitivity)
     {
       if(difference < 0)
@@ -82,8 +87,8 @@ int main() {
   }
 
   cout << "calculated interest: " << avg << endl;
-  cout << "result: " << result(avg) << endl;
+  cout << "result: " << result(avg, POverA) << endl;
   cout << "goal: " << goal << endl;
-  cout << "difference: " << result(avg)- goal<<endl; 
+  cout << "difference: " << result(avg, POverA)- goal<<endl; 
   
 }
