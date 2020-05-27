@@ -1,14 +1,17 @@
 #include <iostream>
 #include <cmath>
-#define precision 0.000001
+#define finePrecision 0.000001
+#define broadPrecision 0.01
+#define fineSensitivity 2.0*finePrecision
+#define broadSensitivity 10*broadPrecision
 #define goal 42500/15096.04
 #define power 4
 using namespace std;
 
 
-bool equivalent(double result)
+bool equivalent(double result, double sensitivity)
 {
-  return abs(result - (double)goal) < 2.0*precision;
+  return abs(result - (double)goal) < sensitivity;
 }
 
 double result(double interest)
@@ -16,23 +19,71 @@ double result(double interest)
   return (pow((1+interest),power)-1.0) / (interest*pow((1.0+interest),power));
 }
 
-
-
-int main() {
-  double sum = 0;
+double interest(bool positive, double bound)
+{
+  double sum = 0.0;
   int count = 0;
-  for( double i = 0.0; i < 1.0; i+=precision)
+  bool found = false;
+  if (positive)
   {
-    double candidate = result(i);
-    if (equivalent(candidate))
+    for( double i = bound; i > 0.0; i-=finePrecision)
     {
-      sum += i;
-      count++;
+      if (abs(result(i) - goal) < fineSensitivity)
+      {
+        sum += i;
+        count++;
+        found = true;
+      }
+      else if(found)
+      {
+        break;
+      }
     }
   }
-  cout << "calculated interest: " << (double)((double)sum/(double)count) << endl;
-  cout << "result: " << result((double)((double)sum/(double)count)) << endl;
+
+  else
+  {
+    for( double i = bound; i < 1.0; i+=finePrecision)
+    {
+      if (abs(result(i) - goal) < fineSensitivity)
+      {
+        sum += i;
+        count++;
+        found = true;
+      }
+      else if(found)
+      {
+        break;
+      }
+    }
+  }
+
+  return (double)((double)sum/(double)count);
+}
+
+int main() {
+  double avg = 999;
+
+  for (double j = 0.0; j < 1.0; j+=broadPrecision)
+  {
+    double difference = result(j) - (double)goal;
+    if(abs(difference) < broadSensitivity)
+    {
+      if(difference < 0)
+      {
+        avg = interest(true, j);
+      }
+      else 
+      {
+        avg = interest(false, j);
+      }
+      break;
+    }
+  }
+
+  cout << "calculated interest: " << avg << endl;
+  cout << "result: " << result(avg) << endl;
   cout << "goal: " << goal << endl;
-  cout << "difference: " << result(((double)sum/(double)count))- goal<<endl; 
+  cout << "difference: " << result(avg)- goal<<endl; 
   
 }
