@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <time.h>
 #define finePrecision 0.000001
 #define broadPrecision 0.01
 #define fineSensitivity 2.0*finePrecision
@@ -7,6 +8,8 @@
 #define goal 42500/15096.04
 #define power 4
 using namespace std;
+
+int count = 0;
 
 
 bool equivalent(double result, double sensitivity)
@@ -33,6 +36,7 @@ double interest(bool positive, double bound)
   {
     for( double i = bound; i > 0.0; i-=finePrecision)
     {
+      count ++;
       if (abs(result(i, POverA) - goal) < fineSensitivity)
       {
         sum += i;
@@ -50,6 +54,7 @@ double interest(bool positive, double bound)
   {
     for( double i = bound; i < 1.0; i+=finePrecision)
     {
+      count ++;
       if (abs(result(i, POverA) - goal) < fineSensitivity)
       {
         sum += i;
@@ -67,10 +72,12 @@ double interest(bool positive, double bound)
 }
 
 int main() {
+  clock_t tStart = clock();
   double avg = 999;
 
   for (double j = 0.0; j < 1.0; j+=broadPrecision)
   {
+    count++;
     double difference = result(j, POverA) - (double)goal;
     if(abs(difference) < broadSensitivity)
     {
@@ -86,6 +93,8 @@ int main() {
     }
   }
 
+  cout << "took " << (double)(clock() - tStart)/CLOCKS_PER_SEC << " seconds to complete" << endl;
+  cout << "took " << count << " iterations" << endl;
   cout << "calculated interest: " << avg << endl;
   cout << "result: " << result(avg, POverA) << endl;
   cout << "goal: " << goal << endl;
